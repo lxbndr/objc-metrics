@@ -1,0 +1,28 @@
+on:
+  pull_request:
+    branches: [ '**' ]
+    types: [opened, synchronize]
+    
+  workflow_dispatch:
+
+jobs:
+  collect-source-branch-metrics:
+    name: Collect "Before" Metrics
+    runs-on: ubuntu-latest
+        
+    # outputs:
+    #   llvm_ref: ${{ steps.checkout_info.outputs.llvm_ref }}
+    #   swift_ref: ${{ steps.checkout_info.outputs.swift_ref }}
+    #   dispatch_ref: ${{ steps.checkout_info.outputs.dispatch_ref }}
+    #   dispatch_repo: ${{ steps.checkout_info.outputs.dispatch_repo }}
+    #   cmark_ref: ${{ steps.checkout_info.outputs.cmark_ref }}
+    #   swift_syntax_ref: ${{ steps.checkout_info.outputs.swift_syntax_ref }}
+
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v3
+      - name: Collect Metrics
+        run: |
+          chmod +x objc-metrics.sh
+          ./objc-metrics.sh
+          
