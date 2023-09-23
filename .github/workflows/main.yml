@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  collect-result-metrics:
-    name: Collect Result Metrics
+  collect-metrics-pr-head:
+    name: Collect Metrics - PR Head
     runs-on: ubuntu-latest
 
     # outputs:
@@ -28,8 +28,8 @@ jobs:
           chmod +x objc-metrics.sh
           ./objc-metrics.sh --export env
 
-  collect-base-metrics:
-    name: Collect Base Metrics
+  collect-metrics-base-ref:
+    name: Collect Metrics - Base
     runs-on: ubuntu-latest
 
     steps:
