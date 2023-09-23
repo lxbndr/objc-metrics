@@ -36,6 +36,7 @@ elif [[ "$EXPORT_TO" == "env" ]]; then
   export NSOBJECTCOMPAT_COUNT
   export OBJC_COUNT
   export OBJCMEMBERS_COUNT
+  echo "Exported to environment"
 else
   echo "Unknown export type: $EXPORT_TO"
 fi
