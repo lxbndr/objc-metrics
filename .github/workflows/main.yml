@@ -67,8 +67,9 @@ jobs:
           - ref_alias: "pr"
             ref: "${{ github.ref }}"
 
-    # outputs:
-    #   nsobject_count_base: ${{ steps.metrics.outputs.nsobject_count }}
+    outputs:
+      nsobject_count_base: ${{ steps.metrics.outputs.nsobject_count_base }}
+      nsobject_count_pr: ${{ steps.metrics.outputs.nsobject_count_pr }}
       # nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
       # objc_count: ${{ steps.metrics.outputs.objc_count }}
       # objcmembers_count: ${{ steps.metrics.outputs.objcmembers_count }}
@@ -80,10 +81,10 @@ jobs:
           ref: ${{ matrix.ref }}
 
       - name: Collect Metrics
-        id: metrics_${{ matrix.ref_alias }}
+        id: metrics
         run: |
           source objc-metrics.sh --export none
-          echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
+          echo "nsobject_count_${{ matrix.ref_alias }}=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
           echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
           echo "objc_count=$OBJC_COUNT" >> "$GITHUB_OUTPUT"
           echo "objcmembers_count=$OBJCMEMBERS_COUNT" >> "$GITHUB_OUTPUT"
