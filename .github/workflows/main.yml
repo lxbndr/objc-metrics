@@ -63,3 +63,14 @@ jobs:
           echo "@objc pr: ${{ needs.collect.outputs.objc_count_pr }}"
           echo "@objcMembers base: ${{ needs.collect.outputs.objcmembers_count_base }}"
           echo "@objcMembers pr: ${{ needs.collect.outputs.objcmembers_count_pr }}"
+
+      - name: Post Comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Hello Comment!'
+            })
