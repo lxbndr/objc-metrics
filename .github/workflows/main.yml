@@ -8,29 +8,38 @@ on:
   workflow_dispatch:
 
 jobs:
-  collect-metrics-pr-head:
+  pr-head:
     name: Collect Metrics - PR Head
     runs-on: ubuntu-latest
 
-    # outputs:
-    #   llvm_ref: ${{ steps.checkout_info.outputs.llvm_ref }}
-    #   swift_ref: ${{ steps.checkout_info.outputs.swift_ref }}
-    #   dispatch_ref: ${{ steps.checkout_info.outputs.dispatch_ref }}
-    #   dispatch_repo: ${{ steps.checkout_info.outputs.dispatch_repo }}
-    #   cmark_ref: ${{ steps.checkout_info.outputs.cmark_ref }}
-    #   swift_syntax_ref: ${{ steps.checkout_info.outputs.swift_syntax_ref }}
+    outputs:
+      nsobject_count: ${{ steps.metrics.outputs.nsobject_count }}
+      nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
+      objc_count: ${{ steps.metrics.outputs.objc_count }}
+      objcmembers_count: ${{ steps.metrics.outputs.objcmembers_count }}
 
     steps:
       - name: Checkout 
         uses: actions/checkout@v3
       - name: Collect Metrics
+        id: metrics
         run: |
           chmod +x objc-metrics.sh
           ./objc-metrics.sh --export env
+          echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_ENV"
+          echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_ENV"
+          echo "objc_count=$OBJC_COUNT" >> "$GITHUB_ENV"
+          echo "objcmembers_count=$OBJCMEMBERS_COUNT" >> "$GITHUB_ENV"
 
-  collect-metrics-base-ref:
+  base-ref:
     name: Collect Metrics - Base
     runs-on: ubuntu-latest
+
+    outputs:
+      nsobject_count: ${{ steps.metrics.outputs.nsobject_count }}
+      nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
+      objc_count: ${{ steps.metrics.outputs.objc_count }}
+      objcmembers_count: ${{ steps.metrics.outputs.objcmembers_count }}
 
     steps:
       - name: Checkout 
@@ -39,7 +48,31 @@ jobs:
           ref: ${{ github.base_ref}}
         
       - name: Collect Metrics
+        id: metrics
         run: |
           chmod +x objc-metrics.sh
           ./objc-metrics.sh --export env
-  
+          echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_ENV"
+          echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_ENV"
+          echo "objc_count=$OBJC_COUNT" >> "$GITHUB_ENV"
+          echo "objcmembers_count=$OBJCMEMBERS_COUNT" >> "$GITHUB_ENV"
+
+  report:
+    name: Report Metrics
+    runs-on: ubuntu-latest
+    needs: [base-ref, pr-head]
+
+    steps:
+      - name: Calculate
+        run: |
+          echo "Base:"
+          echo "NSObject: ${{ needs.base-ref.outputs.nsobject_count }}"
+          echo "NSObjectCompat: ${{ needs.base-ref.outputs.nsobjectcompat_count }}"
+          echo "@objc: ${{ needs.base-ref.outputs.objc_count }}"
+          echo "@objcMembers: ${{ needs.base-ref.outputs.objcmembers_count }}"
+          echo .
+          echo "Pull Request:"
+          echo "NSObject: ${{ needs.pr-head.outputs.nsobject_count }}"
+          echo "NSObjectCompat: ${{ needs.pr-head.outputs.nsobjectcompat_count }}"
+          echo "@objc: ${{ needs.pr-head.outputs.objc_count }}"
+          echo "@objcMembers: ${{ needs.pr-head.outputs.objcmembers_count }}"
