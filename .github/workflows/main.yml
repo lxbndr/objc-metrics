@@ -9,7 +9,7 @@ on:
 
 jobs:
   collect:
-    name: Collect - ${{ matrix.ref_alias }}
+    name: Collect - ${{ matrix.name }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
