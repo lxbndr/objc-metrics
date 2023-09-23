@@ -67,8 +67,8 @@ jobs:
           - ref_alias: "pr"
             ref: "${{ github.ref }}"
 
-    outputs:
-      nsobject_count_base: ${{ steps.metrics_${{ matrix.ref_alias }}.outputs.nsobject_count }}
+    # outputs:
+    #   nsobject_count_base: ${{ steps.metrics.outputs.nsobject_count }}
       # nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
       # objc_count: ${{ steps.metrics.outputs.objc_count }}
       # objcmembers_count: ${{ steps.metrics.outputs.objcmembers_count }}
