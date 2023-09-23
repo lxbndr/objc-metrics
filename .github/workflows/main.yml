@@ -25,7 +25,6 @@ jobs:
         id: metrics
         run: |
           source objc-metrics.sh --export none
-          echo "NSOBJECT_COUNT $NSOBJECT_COUNT"
           echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
           echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
           echo "objc_count=$OBJC_COUNT" >> "$GITHUB_OUTPUT"
@@ -69,7 +68,7 @@ jobs:
             ref: "${{ github.ref }}"
 
     outputs:
-      nsobject_count: ${{ steps.metrics.outputs.nsobject_count }}
+      nsobject_count_${{ ref_alias }}: ${{ steps.metrics.outputs.nsobject_count }}
       nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
       objc_count: ${{ steps.metrics.outputs.objc_count }}
       objcmembers_count: ${{ steps.metrics.outputs.objcmembers_count }}
@@ -84,7 +83,6 @@ jobs:
         id: metrics
         run: |
           source objc-metrics.sh --export none
-          echo "NSOBJECT_COUNT $NSOBJECT_COUNT"
           echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
           echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
           echo "objc_count=$OBJC_COUNT" >> "$GITHUB_OUTPUT"
