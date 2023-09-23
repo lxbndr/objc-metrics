@@ -32,7 +32,7 @@ if [[ "$EXPORT_TO" == "clipboard" ]]; then
   echo -e "$NSOBJECT_COUNT\t$NSOBJECTCOMPAT_COUNT\t$OBJC_COUNT\t$OBJCMEMBERS_COUNT"| pbcopy
   echo "Copied to clipboard"
 elif [[ "$EXPORT_TO" == "env" ]]; then
-  export NSOBJECT_COUNT
+  export NSOBJECT_COUNT=1
   export NSOBJECTCOMPAT_COUNT
   export OBJC_COUNT
   export OBJCMEMBERS_COUNT
