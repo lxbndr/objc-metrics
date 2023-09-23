@@ -8,55 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  pr-head:
-    name: Collect Metrics - PR Head
-    runs-on: ubuntu-latest
-
-    outputs:
-      nsobject_count: ${{ steps.metrics.outputs.nsobject_count }}
-      nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
-      objc_count: ${{ steps.metrics.outputs.objc_count }}
-      objcmembers_count: ${{ steps.metrics.outputs.objcmembers_count }}
-
-    steps:
-      - name: Checkout 
-        uses: actions/checkout@v3
-      - name: Collect Metrics
-        id: metrics
-        run: |
-          source objc-metrics.sh --export none
-          echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
-          echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
-          echo "objc_count=$OBJC_COUNT" >> "$GITHUB_OUTPUT"
-          echo "objcmembers_count=$OBJCMEMBERS_COUNT" >> "$GITHUB_OUTPUT"
-
-  base-ref:
-    name: Collect Metrics - Base
-    runs-on: ubuntu-latest
-
-    outputs:
-      nsobject_count: ${{ steps.metrics.outputs.nsobject_count }}
-      nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
-      objc_count: ${{ steps.metrics.outputs.objc_count }}
-      objcmembers_count: ${{ steps.metrics.outputs.objcmembers_count }}
-
-    steps:
-      - name: Checkout 
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.base_ref}}
-        
-      - name: Collect Metrics
-        id: metrics
-        run: |
-          source objc-metrics.sh --export none
-          echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
-          echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
-          echo "objc_count=$OBJC_COUNT" >> "$GITHUB_OUTPUT"
-          echo "objcmembers_count=$OBJCMEMBERS_COUNT" >> "$GITHUB_OUTPUT"
-
   collect:
-    name: Collect Metrics - ${{ matrix.ref_alias }}
+    name: Collect - ${{ matrix.ref_alias }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -64,8 +17,10 @@ jobs:
         include:
           - ref_alias: "base"
             ref: "${{ github.base_ref}}"
+            name: "PR"
           - ref_alias: "pr"
             ref: "${{ github.ref }}"
+            name: "Base"
 
     outputs:
       nsobject_count_base: ${{ steps.metrics.outputs.nsobject_count_base }}
@@ -83,7 +38,7 @@ jobs:
         with:
           ref: ${{ matrix.ref }}
 
-      - name: Collect Metrics
+      - name: Collect
         id: metrics
         run: |
           source objc-metrics.sh --export none
@@ -93,31 +48,18 @@ jobs:
           echo "objcmembers_count_${{ matrix.ref_alias }}=$OBJCMEMBERS_COUNT" >> "$GITHUB_OUTPUT"
           
   report:
-    name: Report Metrics
+    name: Report
     runs-on: ubuntu-latest
-    needs: [base-ref, pr-head, collect]
+    needs: [collect]
 
     steps:
       - name: Calculate
         run: |
-          echo "Base:"
-          echo "NSObject: ${{ needs.base-ref.outputs.nsobject_count }}"
-          echo "NSObjectCompat: ${{ needs.base-ref.outputs.nsobjectcompat_count }}"
-          echo "@objc: ${{ needs.base-ref.outputs.objc_count }}"
-          echo "@objcMembers: ${{ needs.base-ref.outputs.objcmembers_count }}"
-          echo
-          echo "Pull Request:"
-          echo "NSObject: ${{ needs.pr-head.outputs.nsobject_count }}"
-          echo "NSObjectCompat: ${{ needs.pr-head.outputs.nsobjectcompat_count }}"
-          echo "@objc: ${{ needs.pr-head.outputs.objc_count }}"
-          echo "@objcMembers: ${{ needs.pr-head.outputs.objcmembers_count }}"
-          echo
-          echo "Collect:"
           echo "NSObject base: ${{ needs.collect.outputs.nsobject_count_base }}"
           echo "NSObject pr: ${{ needs.collect.outputs.nsobject_count_pr }}"
-          echo "NSObjectCompat base: ${{ needs.pr-head.outputs.nsobjectcompat_count_base }}"
-          echo "NSObjectCompat pr: ${{ needs.pr-head.outputs.nsobjectcompat_count_pr }}"
-          echo "@objc base: ${{ needs.pr-head.outputs.objc_count_base }}"
-          echo "@objc pr: ${{ needs.pr-head.outputs.objc_count_pr }}"
-          echo "@objcMembers base: ${{ needs.pr-head.outputs.objcmembers_count_base }}"
-          echo "@objcMembers pr: ${{ needs.pr-head.outputs.objcmembers_count_pr }}"
+          echo "NSObjectCompat base: ${{ needs.collect.outputs.nsobjectcompat_count_base }}"
+          echo "NSObjectCompat pr: ${{ needs.collect.outputs.nsobjectcompat_count_pr }}"
+          echo "@objc base: ${{ needs.collect.outputs.objc_count_base }}"
+          echo "@objc pr: ${{ needs.collect.outputs.objc_count_pr }}"
+          echo "@objcMembers base: ${{ needs.collect.outputs.objcmembers_count_base }}"
+          echo "@objcMembers pr: ${{ needs.collect.outputs.objcmembers_count_pr }}"
