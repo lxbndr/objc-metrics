@@ -31,12 +31,7 @@ echo "@objcMembers:   $OBJCMEMBERS_COUNT"
 if [[ "$EXPORT_TO" == "clipboard" ]]; then
   echo -e "$NSOBJECT_COUNT\t$NSOBJECTCOMPAT_COUNT\t$OBJC_COUNT\t$OBJCMEMBERS_COUNT"| pbcopy
   echo "Copied to clipboard"
-elif [[ "$EXPORT_TO" == "env" ]]; then
-  # export NSOBJECT_COUNT
-  # export NSOBJECTCOMPAT_COUNT
-  # export OBJC_COUNT
-  # export OBJCMEMBERS_COUNT
-  echo "Exported to environment"
+elif [[ "$EXPORT_TO" == "none" ]]; then
 else
   echo "Unknown export type: $EXPORT_TO"
 fi
