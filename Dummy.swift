@@ -11,9 +11,7 @@ class DummyObjectCompat2: NSObjectCompat {
 class DummyObject1: NSObject {
 }
 
-class DummyObject2: NSObject {
-}
-
+@objc
 class DummyObject3: NSObject {
 }
 
