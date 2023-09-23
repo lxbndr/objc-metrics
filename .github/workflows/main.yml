@@ -62,7 +62,12 @@ jobs:
     strategy:
       matrix:
         ref_alias: ["base", "pr"]
-        
+        include:
+          - ref_alias: "base"
+            ref: "${{ github.base_ref}}"
+          - ref_alias: "pr"
+            ref: "${{ github.ref }}"
+
     outputs:
       nsobject_count: ${{ steps.metrics.outputs.nsobject_count }}
       nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
