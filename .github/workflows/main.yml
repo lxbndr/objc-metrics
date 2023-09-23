@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  collect-source-branch-metrics:
-    name: Collect "Before" Metrics
+  collect-result-metrics:
+    name: Collect Result Metrics
     runs-on: ubuntu-latest
-        
+
     # outputs:
     #   llvm_ref: ${{ steps.checkout_info.outputs.llvm_ref }}
     #   swift_ref: ${{ steps.checkout_info.outputs.swift_ref }}
@@ -27,4 +27,19 @@ jobs:
         run: |
           chmod +x objc-metrics.sh
           ./objc-metrics.sh --export env
-          
+
+  collect-base-metrics:
+    name: Collect Base Metrics
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.base_ref}}
+        
+      - name: Collect Metrics
+        run: |
+          chmod +x objc-metrics.sh
+          ./objc-metrics.sh --export env
+  
