@@ -68,19 +68,19 @@ jobs:
             ref: "${{ github.ref }}"
 
     outputs:
-      nsobject_count_${{ matrix.ref_alias }}: ${{ steps.metrics.outputs.nsobject_count }}
-      nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
-      objc_count: ${{ steps.metrics.outputs.objc_count }}
-      objcmembers_count: ${{ steps.metrics.outputs.objcmembers_count }}
+      nsobject_count_base: ${{ steps.metrics_${{ matrix.ref_alias }}.outputs.nsobject_count }}
+      # nsobjectcompat_count: ${{ steps.metrics.outputs.nsobjectcompat_count }}
+      # objc_count: ${{ steps.metrics.outputs.objc_count }}
+      # objcmembers_count: ${{ steps.metrics.outputs.objcmembers_count }}
 
     steps:
       - name: Checkout 
         uses: actions/checkout@v3
         with:
           ref: ${{ matrix.ref }}
-          
+
       - name: Collect Metrics
-        id: metrics
+        id: metrics_${{ matrix.ref_alias }}
         run: |
           source objc-metrics.sh --export none
           echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
