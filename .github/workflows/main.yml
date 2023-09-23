@@ -26,6 +26,7 @@ jobs:
         run: |
           chmod +x objc-metrics.sh
           ./objc-metrics.sh --export env
+          echo "NSOBJECT_COUNT $NSOBJECT_COUNT"
           echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
           echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
           echo "objc_count=$OBJC_COUNT" >> "$GITHUB_OUTPUT"
