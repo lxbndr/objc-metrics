@@ -24,8 +24,9 @@ jobs:
       - name: Collect Metrics
         id: metrics
         run: |
+          
           chmod +x objc-metrics.sh
-          ./objc-metrics.sh --export env
+          source objc-metrics.sh --export env
           echo "NSOBJECT_COUNT $NSOBJECT_COUNT"
           echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
           echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
