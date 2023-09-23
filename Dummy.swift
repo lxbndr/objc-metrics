@@ -2,6 +2,7 @@
 protocol DummyProtocol {
 }
 
+@objc
 class DummyObjectCompat1: NSObjectCompat {
 }
 
