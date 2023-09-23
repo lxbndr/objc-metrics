@@ -14,6 +14,7 @@ class DummyObject1: NSObject {
 class DummyObject2: NSObject {
 }
 
+@objcMembers
 class DummyObject3: NSObject {
 }
 
