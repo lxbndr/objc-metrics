@@ -80,7 +80,6 @@ jobs:
               const myComment = value.data.find((comment) => {
                 return comment.user.login == "github-actions[bot]" && comment.user.type == "Bot" && comment.body.startsWith("👋")
               })
-              console.log(myComment)
               if (myComment === undefined) {
                 github.rest.issues.createComment({
                   issue_number: context.issue.number,
