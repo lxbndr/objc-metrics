@@ -89,4 +89,5 @@ jobs:
             })
             comments.then((value) => {
               console.log(value)
+              console.log(value.data[0].user)
             });
