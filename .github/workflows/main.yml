@@ -77,3 +77,13 @@ jobs:
               repo: context.repo.repo,
               body: '👋 Hello Comment!'
             })
+
+      - name: List Comments
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+              issue_number: context.issue.number
+            })
