@@ -71,23 +71,30 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '👋 Hello Comment!'
-            })
-
-      - name: List Comments
-        uses: actions/github-script@v6
-        with:
-          script: |
-            let comments = github.rest.issues.listComments({
+            const comments = github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number
             })
             comments.then((value) => {
-              console.log(value)
-              console.log(value.data[0].user)
-            });
+              const myComment = value.data.find((comment) => {
+                return comment.user.login == "github-actions[bot]" && comment.user.type == "Bot" && comment.body.startsWith("👋")
+              })
+              console.log(myComment)
+              if (myComment === undefined) {
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: "👋 Hello Comment!"
+                })
+              }
+              else {
+                github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: myComment.id,
+                  body: "👋 Hello Comment! " + Date.now()
+                })
+              }
+            })
