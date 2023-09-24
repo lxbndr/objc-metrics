@@ -13,6 +13,3 @@ class DummyObject1: NSObject {
 
 class DummyObject2: NSObject {
 }
-
-class DummyObject4: NSObject {
-}
