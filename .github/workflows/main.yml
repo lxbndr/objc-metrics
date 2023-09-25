@@ -56,16 +56,25 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Calculate
+      - name: Prepare Report
+        env:
+          NSOBJECT_COUNT_BASE: ${{ needs.collect.outputs.nsobject_count_base }}
+          NSOBJECTCOMPAT_COUNT_BASE: ${{ needs.collect.outputs.nsobjectcompat_count_base }}
+          OBJC_COUNT_BASE: ${{ needs.collect.outputs.objc_count_base }}
+          OBJC_MEMBERS_BASE: ${{ needs.collect.outputs.objcmembers_count_base }}
+          NSOBJECT_COUNT_PR: ${{ needs.collect.outputs.nsobject_count_pr }}
+          NSOBJECTCOMPAT_COUNT_PR: ${{ needs.collect.outputs.nsobjectcompat_count_pr }}
+          OBJC_COUNT_PR: ${{ needs.collect.outputs.objc_count_pr }}
+          OBJC_MEMBERS_PR: ${{ needs.collect.outputs.objcmembers_count_pr }}
         run: |
-          echo "NSObject base: ${{ needs.collect.outputs.nsobject_count_base }}"
-          echo "NSObject pr: ${{ needs.collect.outputs.nsobject_count_pr }}"
-          echo "NSObjectCompat base: ${{ needs.collect.outputs.nsobjectcompat_count_base }}"
-          echo "NSObjectCompat pr: ${{ needs.collect.outputs.nsobjectcompat_count_pr }}"
-          echo "@objc base: ${{ needs.collect.outputs.objc_count_base }}"
-          echo "@objc pr: ${{ needs.collect.outputs.objc_count_pr }}"
-          echo "@objcMembers base: ${{ needs.collect.outputs.objcmembers_count_base }}"
-          echo "@objcMembers pr: ${{ needs.collect.outputs.objcmembers_count_pr }}"
+          echo "NSObject base: $NSOBJECT_COUNT_BASE"
+          echo "NSObjectCompat base: $NSOBJECTCOMPAT_COUNT_BASE"
+          echo "@objc base: $OBJC_COUNT_BASE"
+          echo "@objcMembers base: $OBJC_MEMBERS_BASE"
+          echo "NSObject pr: $NSOBJECT_COUNT_PR"
+          echo "NSObjectCompat pr: $NSOBJECTCOMPAT_COUNT_PR"
+          echo "@objc pr: $OBJC_COUNT_BASE"
+          echo "@objcMembers pr: $OBJC_MEMBERS_BASE"
 
       - name: Post Comment
         uses: actions/github-script@v6
