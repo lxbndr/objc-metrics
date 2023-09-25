@@ -61,37 +61,37 @@ jobs:
           NSOBJECT_COUNT_BASE: ${{ needs.collect.outputs.nsobject_count_base }}
           NSOBJECTCOMPAT_COUNT_BASE: ${{ needs.collect.outputs.nsobjectcompat_count_base }}
           OBJC_COUNT_BASE: ${{ needs.collect.outputs.objc_count_base }}
-          OBJC_MEMBERS_BASE: ${{ needs.collect.outputs.objcmembers_count_base }}
+          OBJCMEMBERS_COUNT_BASE: ${{ needs.collect.outputs.objcmembers_count_base }}
           NSOBJECT_COUNT_PR: ${{ needs.collect.outputs.nsobject_count_pr }}
           NSOBJECTCOMPAT_COUNT_PR: ${{ needs.collect.outputs.nsobjectcompat_count_pr }}
           OBJC_COUNT_PR: ${{ needs.collect.outputs.objc_count_pr }}
-          OBJC_MEMBERS_PR: ${{ needs.collect.outputs.objcmembers_count_pr }}
+          OBJCMEMBERS_COUNT_PR: ${{ needs.collect.outputs.objcmembers_count_pr }}
         run: |
-          TOTAL_COUNT_BASE=$(($NSOBJECT_COUNT_BASE+$NSOBJECTCOMPAT_COUNT_BASE+$OBJC_COUNT_BASE+$OBJC_MEMBERS_BASE))
-          TOTAL_COUNT_PR=$(($NSOBJECT_COUNT_PR+$NSOBJECTCOMPAT_COUNT_PR+$OBJC_COUNT_PR+$OBJC_MEMBERS_PR))
+          TOTAL_COUNT_BASE=$(($NSOBJECT_COUNT_BASE+$NSOBJECTCOMPAT_COUNT_BASE+$OBJC_COUNT_BASE+$OBJCMEMBERS_COUNT_BASE))
+          TOTAL_COUNT_PR=$(($NSOBJECT_COUNT_PR+$NSOBJECTCOMPAT_COUNT_PR+$OBJC_COUNT_PR+$OBJCMEMBERS_COUNT_PR))
           
           NSOBJECT_COUNT_DIFF=$(($NSOBJECT_COUNT_PR-$NSOBJECT_COUNT_BASE))
           NSOBJECTCOMPAT_COUNT_DIFF=$(($NSOBJECTCOMPAT_COUNT_PR-$NSOBJECTCOMPAT_COUNT_BASE))
           OBJC_COUNT_DIFF=$(($OBJC_COUNT_PR-$OBJC_COUNT_BASE))
-          OBJC_MEMBERS_DIFF=$(($OBJC_MEMBERS_PR-$OBJC_MEMBERS_BASE))
-          TOTAL_DIFF=$(($TOTAL_COUNT_PR-$TOTAL_COUNT_BASE))
+          OBJC_MEMBERS_COUNT_DIFF=$(($OBJCMEMBERS_COUNT_PR-$OBJCMEMBERS_COUNT_BASE))
+          TOTAL_COUNT_DIFF=$(($TOTAL_COUNT_PR-$TOTAL_COUNT_BASE))
           
           echo "NSObject base: $NSOBJECT_COUNT_BASE"
           echo "NSObjectCompat base: $NSOBJECTCOMPAT_COUNT_BASE"
           echo "@objc base: $OBJC_COUNT_BASE"
-          echo "@objcMembers base: $OBJC_MEMBERS_BASE"
+          echo "@objcMembers base: $OBJCMEMBERS_COUNT_BASE"
           echo "Total base: $TOTAL_COUNT_BASE"
           echo
           echo "NSObject pr: $NSOBJECT_COUNT_PR"
           echo "NSObjectCompat pr: $NSOBJECTCOMPAT_COUNT_PR"
           echo "@objc pr: $OBJC_COUNT_PR"
-          echo "@objcMembers pr: $OBJC_MEMBERS_PR"
+          echo "@objcMembers pr: $OBJCMEMBERS_COUNT_PR"
           echo "Total pr: $TOTAL_COUNT_PR"
           echo
           echo "NSObject diff: $NSOBJECT_COUNT_DIFF"
           echo "NSObjectCompat diff: $NSOBJECTCOMPAT_COUNT_DIFF"
           echo "@objc diff: $OBJC_COUNT_DIFF"
-          echo "@objcMembers diff: $OBJC_MEMBERS_DIFF"
+          echo "@objcMembers diff: $OBJCMEMBERS_COUNT_DIFF"
           echo "Total diff: $TOTAL_COUNT_DIFF"
 
       - name: Post Comment
