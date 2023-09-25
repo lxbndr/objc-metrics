@@ -1,7 +1,7 @@
 name: ObjC Metrics
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [ '**' ]
     types: [opened, synchronize]
     
@@ -73,7 +73,7 @@ jobs:
           NSOBJECT_COUNT_DIFF=$(($NSOBJECT_COUNT_PR-$NSOBJECT_COUNT_BASE))
           NSOBJECTCOMPAT_COUNT_DIFF=$(($NSOBJECTCOMPAT_COUNT_PR-$NSOBJECTCOMPAT_COUNT_BASE))
           OBJC_COUNT_DIFF=$(($OBJC_COUNT_PR-$OBJC_COUNT_BASE))
-          OBJC_MEMBERS_COUNT_DIFF=$(($OBJCMEMBERS_COUNT_PR-$OBJCMEMBERS_COUNT_BASE))
+          OBJCMEMBERS_COUNT_DIFF=$(($OBJCMEMBERS_COUNT_PR-$OBJCMEMBERS_COUNT_BASE))
           TOTAL_COUNT_DIFF=$(($TOTAL_COUNT_PR-$TOTAL_COUNT_BASE))
           
           echo "NSObject base: $NSOBJECT_COUNT_BASE"
