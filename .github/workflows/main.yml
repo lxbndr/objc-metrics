@@ -73,8 +73,8 @@ jobs:
           echo "@objcMembers base: $OBJC_MEMBERS_BASE"
           echo "NSObject pr: $NSOBJECT_COUNT_PR"
           echo "NSObjectCompat pr: $NSOBJECTCOMPAT_COUNT_PR"
-          echo "@objc pr: $OBJC_COUNT_BASE"
-          echo "@objcMembers pr: $OBJC_MEMBERS_BASE"
+          echo "@objc pr: $OBJC_COUNT_PR"
+          echo "@objcMembers pr: $OBJC_MEMBERS_PR"
 
       - name: Post Comment
         uses: actions/github-script@v6
