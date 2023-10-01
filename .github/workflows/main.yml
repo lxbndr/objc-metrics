@@ -57,6 +57,7 @@ jobs:
 
     steps:
       - name: Prepare Report
+        id: prepare_report
         env:
           NSOBJECT_COUNT_BASE: ${{ needs.collect.outputs.nsobject_count_base }}
           NSOBJECTCOMPAT_COUNT_BASE: ${{ needs.collect.outputs.nsobjectcompat_count_base }}
@@ -93,6 +94,14 @@ jobs:
           echo "@objc diff: $OBJC_COUNT_DIFF"
           echo "@objcMembers diff: $OBJCMEMBERS_COUNT_DIFF"
           echo "Total diff: $TOTAL_COUNT_DIFF"
+          
+          echo "nsobject_count_diff=$NSOBJECT_COUNT_DIFF" >> "$GITHUB_OUTPUT"
+          echo "nsobjectcompat_count_diff=$NSOBJECTCOMPAT_COUNT_DIFF" >> "$GITHUB_OUTPUT"
+          echo "objc_count_diff=$OBJC_COUNT" >> "$OBJC_COUNT_DIFF"
+          echo "objcmembers_count_diff=$OBJCMEMBERS_COUNT_DIFF" >> "$GITHUB_OUTPUT"
+          echo "total_count_base=$TOTAL_COUNT_BASE" >> "$GITHUB_OUTPUT"
+          echo "total_count_pr=$TOTAL_COUNT_PR" >> "$GITHUB_OUTPUT"
+          echo "total_count_diff=$TOTAL_COUNT_DIFF" >> "$GITHUB_OUTPUT"
 
       - name: Post Comment
         uses: actions/github-script@v6
@@ -104,15 +113,24 @@ jobs:
               issue_number: context.issue.number
             })
             comments.then((value) => {
+              const reportBody = `## ObjC Usage Report 📊
+              || ${{ github.base_ref}} | #{{ context.issue.number }} | Change |
+              | --- | --: | --: | --: |
+              | `@objc` | ${{ needs.collect.outputs.objc_count_base }} | ${{ needs.collect.outputs.objc_count_pr }} | ${{ steps.prepare_report.outputs.objc_count_pr }} |
+              | `@objcMembers` | ${{ needs.collect.outputs.objcmembers_count_base }} | ${{ needs.collect.outputs.objcmembers_count_pr }} | ${{ steps.prepare_report.outputs.objcmembers_count_diff }} |
+              | `NSObjectCompat` | ${{ needs.collect.outputs.nsobjectcompat_count_base }} | ${{ needs.collect.outputs.nsobjectcompat_count_pr }} | ${{ steps.prepare_report.outputs.nsobjectcompat_count_diff }} |
+              | `NSObject` | ${{ needs.collect.outputs.nsobject_count_base }} | ${{ needs.collect.outputs.nsobject_count_pr }} | ${{ steps.prepare_report.outputs.nsobject_count_diff }} |
+              | **Total** | ${{ steps.prepare_report.outputs.total_count_base }} | ${{ steps.prepare_report.outputs.total_count_pr }} | ${{ steps.prepare_report.outputs.total_count_diff }} |
+              `
               const myComment = value.data.find((comment) => {
-                return comment.user.login == "github-actions[bot]" && comment.user.type == "Bot" && comment.body.startsWith("👋")
+                return comment.user.login == "github-actions[bot]" && comment.user.type == "Bot" && comment.body.startsWith("## ObjC Usage Report 📊")
               })
               if (myComment === undefined) {
                 github.rest.issues.createComment({
                   issue_number: context.issue.number,
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  body: "👋 Hello Comment!"
+                  body: reportBody
                 })
               }
               else {
@@ -120,7 +138,7 @@ jobs:
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   comment_id: myComment.id,
-                  body: "👋 Hello Comment! " + Date.now()
+                  body: reportBody
                 })
               }
             })
