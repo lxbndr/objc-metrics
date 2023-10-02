@@ -114,7 +114,7 @@ jobs:
             })
             comments.then((value) => {
               const reportBody = `## ObjC Usage Report 📊
-              || [${{ github.base_ref}}](${{github.server_url}}/${{ github.repository }}/tree/${{ github.base_ref}}) | #${{ github.event.issue.number }} | Change |
+              || [${{ github.base_ref}}](${{github.server_url}}/${{ github.repository }}/tree/${{ github.base_ref}}) | #${{ github.event.pull_request.number }} | Change |
               | --- | --: | --: | --: |
               | \`@objc\` | ${{ needs.collect.outputs.objc_count_base }} | ${{ needs.collect.outputs.objc_count_pr }} | ${{ steps.prepare_report.outputs.objc_count_diff }} |
               | \`@objcMembers\` | ${{ needs.collect.outputs.objcmembers_count_base }} | ${{ needs.collect.outputs.objcmembers_count_pr }} | ${{ steps.prepare_report.outputs.objcmembers_count_diff }} |
