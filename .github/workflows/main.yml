@@ -97,7 +97,7 @@ jobs:
           
           echo "nsobject_count_diff=$NSOBJECT_COUNT_DIFF" >> "$GITHUB_OUTPUT"
           echo "nsobjectcompat_count_diff=$NSOBJECTCOMPAT_COUNT_DIFF" >> "$GITHUB_OUTPUT"
-          echo "objc_count_diff=$OBJC_COUNT" >> "$OBJC_COUNT_DIFF"
+          echo "objc_count_diff=$OBJC_COUNT_DIFF" >> "$GITHUB_OUTPUT"
           echo "objcmembers_count_diff=$OBJCMEMBERS_COUNT_DIFF" >> "$GITHUB_OUTPUT"
           echo "total_count_base=$TOTAL_COUNT_BASE" >> "$GITHUB_OUTPUT"
           echo "total_count_pr=$TOTAL_COUNT_PR" >> "$GITHUB_OUTPUT"
