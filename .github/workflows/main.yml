@@ -34,9 +34,11 @@ jobs:
 
     steps:
       - name: Checkout 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ matrix.ref }}
+          fetch-depth: 1
+          sparse-checkout: '**/*.swift'
 
       - name: Collect
         id: metrics
@@ -120,7 +122,7 @@ jobs:
               | \`@objcMembers\` | ${{ needs.collect.outputs.objcmembers_count_base }} | ${{ needs.collect.outputs.objcmembers_count_pr }} | ${{ steps.prepare_report.outputs.objcmembers_count_diff }} |
               | \`NSObjectCompat\` | ${{ needs.collect.outputs.nsobjectcompat_count_base }} | ${{ needs.collect.outputs.nsobjectcompat_count_pr }} | ${{ steps.prepare_report.outputs.nsobjectcompat_count_diff }} |
               | \`NSObject\` | ${{ needs.collect.outputs.nsobject_count_base }} | ${{ needs.collect.outputs.nsobject_count_pr }} | ${{ steps.prepare_report.outputs.nsobject_count_diff }} |
-              | **Total** | ${{ steps.prepare_report.outputs.total_count_base }} | ${{ steps.prepare_report.outputs.total_count_pr }} | ${{ steps.prepare_report.outputs.total_count_diff }} |
+              | **Total** | **${{ steps.prepare_report.outputs.total_count_base }}** | **${{ steps.prepare_report.outputs.total_count_pr }}** | **${{ steps.prepare_report.outputs.total_count_diff }}** |
               `
               const myComment = value.data.find((comment) => {
                 return comment.user.login == "github-actions[bot]" && comment.user.type == "Bot" && comment.body.startsWith("## ObjC Usage Report 📊")
