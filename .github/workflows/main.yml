@@ -118,14 +118,53 @@ jobs:
               issue_number: context.issue.number
             })
             comments.then((value) => {
+              const objcCountBase = ${{ needs.collect.outputs.objc_count_base }}
+              const objcCountPR = ${{ needs.collect.outputs.objc_count_pr }}
+              const objcCountDiff = ${{ steps.prepare_report.outputs.objc_count_diff }}
+
+              const objcMembersCountBase = ${{ needs.collect.outputs.objcmembers_count_base }}
+              const objcMembersCountPR = ${{ needs.collect.outputs.objcmembers_count_pr }}
+              const objcMembersCountDiff = ${{ steps.prepare_report.outputs.objcmembers_count_diff }}
+
+              const nsObjectCompatCountBase = ${{ needs.collect.outputs.nsobjectcompat_count_base }}
+              const nsObjectCompatCountPR = ${{ needs.collect.outputs.nsobjectcompat_count_pr }}
+              const nsObjectCompatCountDiff = ${{ steps.prepare_report.outputs.nsobjectcompat_count_diff }}
+
+              const nsObjectCountBase = ${{ needs.collect.outputs.nsobject_count_base }}
+              const nsObjectCountPR = ${{ needs.collect.outputs.nsobject_count_pr }}
+              const nsObjectCountDiff = ${{ steps.prepare_report.outputs.nsobject_count_diff }}
+
+              const totalCountPR = ${{ steps.prepare_report.outputs.total_count_pr }}
+              const totalCountBase = ${{ steps.prepare_report.outputs.total_count_base }}
+              const totalCountDiff = ${{ steps.prepare_report.outputs.total_count_diff }}
+              
+              const refLink = "[${{ github.base_ref}}](${{github.server_url}}/${{ github.repository }}/tree/${{ github.base_ref}})"
+              const prLink = "#${{ github.event.pull_request.number }}"
+              
+              let conclusion
+              let conclusionMarker
+              if (totalCountDiff > 0) {
+                conclusion = "increase"
+                conclusionMarker = "😢"
+              }
+              else if (totalCountDiff < 0) {
+                conclusion = "decrease"
+                conclusionMarker = "🥳"
+              }
+              else {
+                conclusion = "not change"
+                conclusionMarker = "✔︎"
+              }
+              
               const reportBody = `## ObjC Usage Report 📊
-              || [${{ github.base_ref}}](${{github.server_url}}/${{ github.repository }}/tree/${{ github.base_ref}}) | #${{ github.event.pull_request.number }} | Change |
+              ${conclusionMarker} Merging ${prLink} int ${refLink} will **${conclusion}** ObjC usage
+              || ${refLink} | ${prLink} | Change |
               | --- | --: | --: | --: |
-              | \`@objc\` | ${{ needs.collect.outputs.objc_count_base }} | ${{ needs.collect.outputs.objc_count_pr }} | ${{ steps.prepare_report.outputs.objc_count_diff }} |
-              | \`@objcMembers\` | ${{ needs.collect.outputs.objcmembers_count_base }} | ${{ needs.collect.outputs.objcmembers_count_pr }} | ${{ steps.prepare_report.outputs.objcmembers_count_diff }} |
-              | \`NSObjectCompat\` | ${{ needs.collect.outputs.nsobjectcompat_count_base }} | ${{ needs.collect.outputs.nsobjectcompat_count_pr }} | ${{ steps.prepare_report.outputs.nsobjectcompat_count_diff }} |
-              | \`NSObject\` | ${{ needs.collect.outputs.nsobject_count_base }} | ${{ needs.collect.outputs.nsobject_count_pr }} | ${{ steps.prepare_report.outputs.nsobject_count_diff }} |
-              | **Total** | **${{ steps.prepare_report.outputs.total_count_base }}** | **${{ steps.prepare_report.outputs.total_count_pr }}** | **${{ steps.prepare_report.outputs.total_count_diff }}** |
+              | \`@objc\` | ${objcCountBase} | ${objcCountPR} | ${objcCountDiff} |
+              | \`@objcMembers\` | ${objcMembersCountBase} | ${objcMembersCountPR} | ${objcMembersCountDiff} |
+              | \`NSObjectCompat\` | ${nsObjectCompatCountBase} | ${nsObjectCompatCountPR} | ${nsObjectCompatCountDiff} |
+              | \`NSObject\` | ${nsObjectCountBase} | ${nsObjectCountPR} | ${nsObjectCountDiff} |
+              | **Total** | **${totalCountBase}** | **${totalCountPR}** | **${totalCountDiff}** |
               `
               const myComment = value.data.find((comment) => {
                 return comment.user.login == "github-actions[bot]" && comment.user.type == "Bot" && comment.body.startsWith("## ObjC Usage Report 📊")
