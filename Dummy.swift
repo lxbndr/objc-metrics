@@ -21,3 +21,6 @@ class DummyObject3: NSObject {
 @objcMembers
 class DummyObject4: NSObject {
 }
+
+class D {
+}
