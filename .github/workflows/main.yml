@@ -110,6 +110,7 @@ jobs:
 
       - name: Post Comment
         uses: actions/github-script@v6
+        if: steps.prepare_report.outputs.objc_count_diff != 0 || steps.prepare_report.outputs.objcmembers_count_diff != 0 || steps.prepare_report.outputs.nsobjectcompat_count_diff != 0 || steps.prepare_report.outputs.nsobject_count_diff != 0
         with:
           script: |
             const comments = github.rest.issues.listComments({
