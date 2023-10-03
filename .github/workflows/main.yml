@@ -38,6 +38,7 @@ jobs:
         with:
           ref: ${{ matrix.ref }}
           fetch-depth: 1
+          sparse-checkout-cone-mode: false
           sparse-checkout: '**/*.swift'
 
       - name: Collect
