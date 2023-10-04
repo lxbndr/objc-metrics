@@ -11,16 +11,6 @@ jobs:
   collect:
     name: PR Report
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ref_alias: ["base", "pr"]
-        include:
-          - ref_alias: "base"
-            ref: "${{ github.base_ref}}"
-            name: "PR"
-          - ref_alias: "pr"
-            ref: "${{ github.ref }}"
-            name: "Base"
 
     outputs:
       nsobject_count_base: ${{ steps.metrics.outputs.nsobject_count_base }}
@@ -92,13 +82,13 @@ jobs:
           OBJCMEMBERS_COUNT_DIFF=$(($OBJCMEMBERS_COUNT_HEAD-$OBJCMEMBERS_COUNT_BASE))
           TOTAL_COUNT_DIFF=$(($TOTAL_COUNT_HEAD-$TOTAL_COUNT_BASE))
           
-          printf "               |  Base  |  Head  |  Change  |\n"
-          printf "---------------|--------|--------|----------|\n"
+          printf "%s\n" "               |  Base  |  Head  |  Change  |"
+          printf "%s\n" "---------------|--------|--------|----------|"
           printf "@objc          | %6d | %6d | %8d |\n" $OBJC_COUNT_BASE $OBJC_COUNT_HEAD $OBJC_COUNT_DIFF
           printf "@objcMembers   | %6d | %6d | %8d |\n" $OBJCMEMBERS_COUNT_BASE $OBJCMEMBERS_COUNT_HEAD $OBJCMEMBERS_COUNT_DIFF
           printf "NSObjectCompat | %6d | %6d | %8d |\n" $NSOBJECTCOMPAT_COUNT_BASE $NSOBJECTCOMPAT_COUNT_HEAD $NSOBJECTCOMPAT_COUNT_DIFF
           printf "NSObject       | %6d | %6d | %8d |\n" $NSOBJECT_COUNT_BASE $NSOBJECT_COUNT_HEAD $NSOBJECT_COUNT_DIFF
-          printf "---------------|--------|--------|----------|\n"
+          printf "%s\n" "---------------|--------|--------|----------|"
           printf "Total          | %6d | %6d | %8d |\n" $TOTAL_COUNT_BASE $TOTAL_COUNT_HEAD $TOTAL_COUNT_DIFF
           
           echo "nsobject_count_diff=$NSOBJECT_COUNT_DIFF" >> "$GITHUB_OUTPUT"
