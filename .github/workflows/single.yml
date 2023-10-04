@@ -12,15 +12,8 @@ jobs:
     name: PR Report
     runs-on: ubuntu-latest
 
-    outputs:
-      nsobject_count_base: ${{ steps.metrics.outputs.nsobject_count_base }}
-      nsobject_count_pr: ${{ steps.metrics.outputs.nsobject_count_pr }}
-      nsobjectcompat_count_base: ${{ steps.metrics.outputs.nsobjectcompat_count_base }}
-      nsobjectcompat_count_pr: ${{ steps.metrics.outputs.nsobjectcompat_count_pr }}
-      objc_count_base: ${{ steps.metrics.outputs.objc_count_base }}
-      objc_count_pr: ${{ steps.metrics.outputs.objc_count_pr }}
-      objcmembers_count_base: ${{ steps.metrics.outputs.objcmembers_count_base }}
-      objcmembers_count_pr: ${{ steps.metrics.outputs.objcmembers_count_pr }}
+    permissions:
+      pull-requests: write
 
     steps:
       - name: Checkout - Base
@@ -113,19 +106,19 @@ jobs:
               const objcCountBase = ${{ steps.measure_base.outputs.objc_count }}
               const objcCountHead = ${{ steps.measure_head.outputs.objc_count }}
               const objcCountDiff = ${{ steps.prepare_report.outputs.objc_count_diff }}
-
+              
               const objcMembersCountBase = ${{ steps.measure_base.outputs.objcmembers_count }}
               const objcMembersCountHead = ${{ steps.measure_head.outputs.objcmembers_count }}
               const objcMembersCountDiff = ${{ steps.prepare_report.outputs.objcmembers_count_diff }}
-
+              
               const nsObjectCompatCountBase = ${{ steps.measure_base.outputs.nsobjectcompat_count }}
               const nsObjectCompatCountHead = ${{ steps.measure_head.outputs.nsobjectcompat_count }}
               const nsObjectCompatCountDiff = ${{ steps.prepare_report.outputs.nsobjectcompat_count_diff }}
-
+              
               const nsObjectCountBase = ${{ steps.measure_base.outputs.nsobject_count }}
               const nsObjectCountHead = ${{ steps.measure_head.outputs.nsobject_count }}
               const nsObjectCountDiff = ${{ steps.prepare_report.outputs.nsobject_count_diff }}
-
+              
               const totalCountBase = ${{ steps.prepare_report.outputs.total_count_base }}
               const totalCountHead = ${{ steps.prepare_report.outputs.total_count_head }}
               const totalCountDiff = ${{ steps.prepare_report.outputs.total_count_diff }}
