@@ -142,7 +142,7 @@ jobs:
               }
               
               const reportBody = `## ObjC Usage Report 📊
-              ${conclusionMarker} Merging ${prLink} int ${refLink} will **${conclusion}** ObjC usage
+              ${conclusionMarker} Merging ${prLink} into ${refLink} will **${conclusion}** ObjC usage
               || ${refLink} | ${prLink} | Change |
               | --- | --: | --: | --: |
               | \`@objc\` | ${objcCountBase} | ${objcCountHead} | ${objcCountDiff} |
