@@ -4,12 +4,12 @@ on:
   pull_request:
     branches: [ '**' ]
     types: [opened, synchronize]
-    
+
   workflow_dispatch:
 
 jobs:
   collect:
-    name: Collect - ${{ matrix.name }}
+    name: PR Report
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -33,79 +33,80 @@ jobs:
       objcmembers_count_pr: ${{ steps.metrics.outputs.objcmembers_count_pr }}
 
     steps:
-      - name: Checkout 
+      - name: Checkout - Base
         uses: actions/checkout@v4
         with:
-          ref: ${{ matrix.ref }}
+          ref: ${{ github.base_ref}}
           fetch-depth: 1
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             **/*.swift
             /objc-metrics.sh
 
-      - name: Collect
-        id: metrics
+      - name: Measure - Base
+        id: measure_base
         run: |
           source objc-metrics.sh --export none
-          echo "nsobject_count_${{ matrix.ref_alias }}=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
-          echo "nsobjectcompat_count_${{ matrix.ref_alias }}=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
-          echo "objc_count_${{ matrix.ref_alias }}=$OBJC_COUNT" >> "$GITHUB_OUTPUT"
-          echo "objcmembers_count_${{ matrix.ref_alias }}=$OBJCMEMBERS_COUNT" >> "$GITHUB_OUTPUT"
-          
-  report:
-    name: Report
-    runs-on: ubuntu-latest
-    needs: [collect]
+          echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
+          echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
+          echo "objc_count=$OBJC_COUNT" >> "$GITHUB_OUTPUT"
+          echo "objcmembers_count=$OBJCMEMBERS_COUNT" >> "$GITHUB_OUTPUT"
 
-    permissions:
-      pull-requests: write
+      - name: Checkout - Head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            **/*.swift
+            /objc-metrics.sh
 
-    steps:
+      - name: Measure - Head
+        id: measure_head
+        run: |
+          source objc-metrics.sh --export none
+          echo "nsobject_count=$NSOBJECT_COUNT" >> "$GITHUB_OUTPUT"
+          echo "nsobjectcompat_count=$NSOBJECTCOMPAT_COUNT" >> "$GITHUB_OUTPUT"
+          echo "objc_count=$OBJC_COUNT" >> "$GITHUB_OUTPUT"
+          echo "objcmembers_count=$OBJCMEMBERS_COUNT" >> "$GITHUB_OUTPUT"
+
       - name: Prepare Report
         id: prepare_report
         env:
-          NSOBJECT_COUNT_BASE: ${{ needs.collect.outputs.nsobject_count_base }}
-          NSOBJECTCOMPAT_COUNT_BASE: ${{ needs.collect.outputs.nsobjectcompat_count_base }}
-          OBJC_COUNT_BASE: ${{ needs.collect.outputs.objc_count_base }}
-          OBJCMEMBERS_COUNT_BASE: ${{ needs.collect.outputs.objcmembers_count_base }}
-          NSOBJECT_COUNT_PR: ${{ needs.collect.outputs.nsobject_count_pr }}
-          NSOBJECTCOMPAT_COUNT_PR: ${{ needs.collect.outputs.nsobjectcompat_count_pr }}
-          OBJC_COUNT_PR: ${{ needs.collect.outputs.objc_count_pr }}
-          OBJCMEMBERS_COUNT_PR: ${{ needs.collect.outputs.objcmembers_count_pr }}
+          NSOBJECT_COUNT_BASE: ${{ steps.measure_base.outputs.nsobject_count }}
+          NSOBJECTCOMPAT_COUNT_BASE: ${{ steps.measure_base.outputs.nsobjectcompat_count }}
+          OBJC_COUNT_BASE: ${{ steps.measure_base.outputs.objc_count }}
+          OBJCMEMBERS_COUNT_BASE: ${{ steps.measure_base.outputs.objcmembers_count }}
+          NSOBJECT_COUNT_HEAD: ${{ steps.measure_head.outputs.nsobject_count }}
+          NSOBJECTCOMPAT_COUNT_HEAD: ${{ steps.measure_head.outputs.nsobjectcompat_count }}
+          OBJC_COUNT_HEAD: ${{ steps.measure_head.outputs.objc_count }}
+          OBJCMEMBERS_COUNT_HEAD: ${{ steps.measure_head.outputs.objcmembers_count }}
         run: |
           TOTAL_COUNT_BASE=$(($NSOBJECT_COUNT_BASE+$NSOBJECTCOMPAT_COUNT_BASE+$OBJC_COUNT_BASE+$OBJCMEMBERS_COUNT_BASE))
-          TOTAL_COUNT_PR=$(($NSOBJECT_COUNT_PR+$NSOBJECTCOMPAT_COUNT_PR+$OBJC_COUNT_PR+$OBJCMEMBERS_COUNT_PR))
+          TOTAL_COUNT_HEAD=$(($NSOBJECT_COUNT_HEAD+$NSOBJECTCOMPAT_COUNT_HEAD+$OBJC_COUNT_HEAD+$OBJCMEMBERS_COUNT_HEAD))
           
-          NSOBJECT_COUNT_DIFF=$(($NSOBJECT_COUNT_PR-$NSOBJECT_COUNT_BASE))
-          NSOBJECTCOMPAT_COUNT_DIFF=$(($NSOBJECTCOMPAT_COUNT_PR-$NSOBJECTCOMPAT_COUNT_BASE))
-          OBJC_COUNT_DIFF=$(($OBJC_COUNT_PR-$OBJC_COUNT_BASE))
-          OBJCMEMBERS_COUNT_DIFF=$(($OBJCMEMBERS_COUNT_PR-$OBJCMEMBERS_COUNT_BASE))
-          TOTAL_COUNT_DIFF=$(($TOTAL_COUNT_PR-$TOTAL_COUNT_BASE))
+          NSOBJECT_COUNT_DIFF=$(($NSOBJECT_COUNT_HEAD-$NSOBJECT_COUNT_BASE))
+          NSOBJECTCOMPAT_COUNT_DIFF=$(($NSOBJECTCOMPAT_COUNT_HEAD-$NSOBJECTCOMPAT_COUNT_BASE))
+          OBJC_COUNT_DIFF=$(($OBJC_COUNT_HEAD-$OBJC_COUNT_BASE))
+          OBJCMEMBERS_COUNT_DIFF=$(($OBJCMEMBERS_COUNT_HEAD-$OBJCMEMBERS_COUNT_BASE))
+          TOTAL_COUNT_DIFF=$(($TOTAL_COUNT_HEAD-$TOTAL_COUNT_BASE))
           
-          echo "NSObject base: $NSOBJECT_COUNT_BASE"
-          echo "NSObjectCompat base: $NSOBJECTCOMPAT_COUNT_BASE"
-          echo "@objc base: $OBJC_COUNT_BASE"
-          echo "@objcMembers base: $OBJCMEMBERS_COUNT_BASE"
-          echo "Total base: $TOTAL_COUNT_BASE"
-          echo
-          echo "NSObject pr: $NSOBJECT_COUNT_PR"
-          echo "NSObjectCompat pr: $NSOBJECTCOMPAT_COUNT_PR"
-          echo "@objc pr: $OBJC_COUNT_PR"
-          echo "@objcMembers pr: $OBJCMEMBERS_COUNT_PR"
-          echo "Total pr: $TOTAL_COUNT_PR"
-          echo
-          echo "NSObject diff: $NSOBJECT_COUNT_DIFF"
-          echo "NSObjectCompat diff: $NSOBJECTCOMPAT_COUNT_DIFF"
-          echo "@objc diff: $OBJC_COUNT_DIFF"
-          echo "@objcMembers diff: $OBJCMEMBERS_COUNT_DIFF"
-          echo "Total diff: $TOTAL_COUNT_DIFF"
+          printf "               |  Base  |  Head  |  Change  |\n"
+          printf "---------------|--------|--------|----------|\n"
+          printf "@objc          | %6d | %6d | %8d |\n" $OBJC_COUNT_BASE $OBJC_COUNT_HEAD $OBJC_COUNT_DIFF
+          printf "@objcMembers   | %6d | %6d | %8d |\n" $OBJCMEMBERS_COUNT_BASE $OBJCMEMBERS_COUNT_HEAD $OBJCMEMBERS_COUNT_DIFF
+          printf "NSObjectCompat | %6d | %6d | %8d |\n" $NSOBJECTCOMPAT_COUNT_BASE $NSOBJECTCOMPAT_COUNT_HEAD $NSOBJECTCOMPAT_COUNT_DIFF
+          printf "NSObject       | %6d | %6d | %8d |\n" $NSOBJECT_COUNT_BASE $NSOBJECT_COUNT_HEAD $NSOBJECT_COUNT_DIFF
+          printf "---------------|--------|--------|----------|\n"
+          printf "Total          | %6d | %6d | %8d |\n" $TOTAL_COUNT_BASE $TOTAL_COUNT_HEAD $TOTAL_COUNT_DIFF
           
           echo "nsobject_count_diff=$NSOBJECT_COUNT_DIFF" >> "$GITHUB_OUTPUT"
           echo "nsobjectcompat_count_diff=$NSOBJECTCOMPAT_COUNT_DIFF" >> "$GITHUB_OUTPUT"
           echo "objc_count_diff=$OBJC_COUNT_DIFF" >> "$GITHUB_OUTPUT"
           echo "objcmembers_count_diff=$OBJCMEMBERS_COUNT_DIFF" >> "$GITHUB_OUTPUT"
           echo "total_count_base=$TOTAL_COUNT_BASE" >> "$GITHUB_OUTPUT"
-          echo "total_count_pr=$TOTAL_COUNT_PR" >> "$GITHUB_OUTPUT"
+          echo "total_count_head=$TOTAL_COUNT_HEAD" >> "$GITHUB_OUTPUT"
           echo "total_count_diff=$TOTAL_COUNT_DIFF" >> "$GITHUB_OUTPUT"
 
       - name: Post Comment
@@ -119,24 +120,24 @@ jobs:
               issue_number: context.issue.number
             })
             comments.then((value) => {
-              const objcCountBase = ${{ needs.collect.outputs.objc_count_base }}
-              const objcCountPR = ${{ needs.collect.outputs.objc_count_pr }}
+              const objcCountBase = ${{ steps.measure_base.outputs.objc_count }}
+              const objcCountHead = ${{ steps.measure_head.outputs.objc_count }}
               const objcCountDiff = ${{ steps.prepare_report.outputs.objc_count_diff }}
 
-              const objcMembersCountBase = ${{ needs.collect.outputs.objcmembers_count_base }}
-              const objcMembersCountPR = ${{ needs.collect.outputs.objcmembers_count_pr }}
+              const objcMembersCountBase = ${{ steps.measure_base.outputs.objcmembers_count }}
+              const objcMembersCountHead = ${{ steps.measure_head.outputs.objcmembers_count }}
               const objcMembersCountDiff = ${{ steps.prepare_report.outputs.objcmembers_count_diff }}
 
-              const nsObjectCompatCountBase = ${{ needs.collect.outputs.nsobjectcompat_count_base }}
-              const nsObjectCompatCountPR = ${{ needs.collect.outputs.nsobjectcompat_count_pr }}
+              const nsObjectCompatCountBase = ${{ steps.measure_base.outputs.nsobjectcompat_count }}
+              const nsObjectCompatCountHead = ${{ steps.measure_head.outputs.nsobjectcompat_count }}
               const nsObjectCompatCountDiff = ${{ steps.prepare_report.outputs.nsobjectcompat_count_diff }}
 
-              const nsObjectCountBase = ${{ needs.collect.outputs.nsobject_count_base }}
-              const nsObjectCountPR = ${{ needs.collect.outputs.nsobject_count_pr }}
+              const nsObjectCountBase = ${{ steps.measure_base.outputs.nsobject_count }}
+              const nsObjectCountHead = ${{ steps.measure_head.outputs.nsobject_count }}
               const nsObjectCountDiff = ${{ steps.prepare_report.outputs.nsobject_count_diff }}
 
-              const totalCountPR = ${{ steps.prepare_report.outputs.total_count_pr }}
               const totalCountBase = ${{ steps.prepare_report.outputs.total_count_base }}
+              const totalCountHead = ${{ steps.prepare_report.outputs.total_count_head }}
               const totalCountDiff = ${{ steps.prepare_report.outputs.total_count_diff }}
               
               const refLink = "[${{ github.base_ref}}](${{github.server_url}}/${{ github.repository }}/tree/${{ github.base_ref}})"
@@ -161,11 +162,11 @@ jobs:
               ${conclusionMarker} Merging ${prLink} int ${refLink} will **${conclusion}** ObjC usage
               || ${refLink} | ${prLink} | Change |
               | --- | --: | --: | --: |
-              | \`@objc\` | ${objcCountBase} | ${objcCountPR} | ${objcCountDiff} |
-              | \`@objcMembers\` | ${objcMembersCountBase} | ${objcMembersCountPR} | ${objcMembersCountDiff} |
-              | \`NSObjectCompat\` | ${nsObjectCompatCountBase} | ${nsObjectCompatCountPR} | ${nsObjectCompatCountDiff} |
-              | \`NSObject\` | ${nsObjectCountBase} | ${nsObjectCountPR} | ${nsObjectCountDiff} |
-              | **Total** | **${totalCountBase}** | **${totalCountPR}** | **${totalCountDiff}** |
+              | \`@objc\` | ${objcCountBase} | ${objcCountHead} | ${objcCountDiff} |
+              | \`@objcMembers\` | ${objcMembersCountBase} | ${objcMembersCountHead} | ${objcMembersCountDiff} |
+              | \`NSObjectCompat\` | ${nsObjectCompatCountBase} | ${nsObjectCompatCountHead} | ${nsObjectCompatCountDiff} |
+              | \`NSObject\` | ${nsObjectCountBase} | ${nsObjectCountHead} | ${nsObjectCountDiff} |
+              | **Total** | **${totalCountBase}** | **${totalCountHead}** | **${totalCountDiff}** |
               `
               const myComment = value.data.find((comment) => {
                 return comment.user.login == "github-actions[bot]" && comment.user.type == "Bot" && comment.body.startsWith("## ObjC Usage Report 📊")
